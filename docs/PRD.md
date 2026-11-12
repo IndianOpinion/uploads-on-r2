@@ -634,5 +634,5 @@ Answer each in `docs/ARCHITECTURE.md`.
     the browser cache value for types that get replaced.
 13. **Keep the route narrow.** Route only the uploads path. A zone-wide
     route makes the Worker a single point of failure for the whole site.
-14. **Do not test the Cache API on the default Workers subdomain.** It does nothing there,
-    and a passing check proves nothing.
+14. **Do not test the Cache API on the default Workers subdomain.** It does
+    nothing there, and a passing check proves nothing.
