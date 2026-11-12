@@ -142,7 +142,7 @@ runs before the method check so that no method can reach a private path.
     literal key.
 13. No Unicode normalisation is applied. The key bytes are the decoded
     request bytes. A file stored under an NFD name and requested in NFC is
-    a miss and falls back (see rule 14.9).
+    a miss and falls back (see lesson 9 in section 14).
 14. A relative key whose object key is longer than 1024 bytes of UTF-8
     (the R2 key limit) is passed without an R2 read.
 
@@ -248,7 +248,7 @@ Conditionals are evaluated in the order RFC 9110 section 13.2.2 sets, for
 38. An unparseable date in `If-Modified-Since` or `If-Unmodified-Since` is
     ignored, as RFC 9110 requires.
 39. A failed `If-Match` must produce `412`, never `304`. (The first version
-    returned `304` for every failed precondition. See rule 14.4.)
+    returned `304` for every failed precondition. See lesson 4 in section 14.)
 40. When the read uses R2's own precondition support to avoid transferring
     a body, the Worker must still decide between `304` and `412` itself.
 
@@ -262,7 +262,7 @@ Only a single range in the `bytes` unit is honoured.
 42. Open-ended `bytes=500-` returns bytes 500 to the end.
 43. Suffix `bytes=-200` returns the last 200 bytes, with
     `content-range: bytes 800-999/1000`. (R2 reports a suffix range
-    without an offset; see rule 14.3.)
+    without an offset; see lesson 3 in section 14.)
 44. A suffix longer than the object (`bytes=-5000`) returns the whole
     object as `206` with `content-range: bytes 0-999/1000`.
 45. An end beyond the object (`bytes=900-5000`) is clamped to the last
@@ -277,7 +277,7 @@ Only a single range in the `bytes` unit is honoured.
     `200`.
 49. `HEAD` with a valid range returns the `206` headers with no body.
 50. A plain `GET` without `Range` is never answered with `206`. (R2 fills
-    in range information even for a full read; see rule 14.2.)
+    in range information even for a full read; see lesson 2 in section 14.)
 51. `accept-ranges: bytes` is on every R2 and edge-cache response,
     including `206`.
 
@@ -374,7 +374,7 @@ pattern `example.com/wp-content/uploads/*` with `zone_name =
 "<your-zone>"`, one `[[r2_buckets]]` table with `binding = "UPLOADS"`
 and `bucket_name = "<your-bucket>"`, `compatibility_date` of 2026-10-01
 or later, `workers_dev = false`. Every top-level key sits above the first
-table header (rule 14.6).
+table header (lesson 6 in section 14).
 
 ### 5.5 Companion sync script
 
@@ -385,7 +385,7 @@ table header (rule 14.6).
   `--max-age <duration>` (only files changed within this window, for
   frequent cron runs).
 - Copies, never syncs or deletes. An object deleted on the origin stays in
-  the bucket (rule 14.10).
+  the bucket (lesson 10 in section 14).
 - Includes only the media extensions, upper and lower case; excludes the
   deny prefixes, always.
 - Sets content type by extension.
