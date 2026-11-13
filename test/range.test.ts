@@ -55,6 +55,7 @@ describe("4.8 range requests", () => {
       ["a.mp4", "bytes=2000-3000", 1000],
       ["empty.mp4", "bytes=0-", 0],
       ["empty.mp4", "bytes=-5", 0],
+      ["a.mp4", "bytes=-0", 1000],
     ] as const) {
       const before = h.bucket.calls.length;
       const res = await h.run(PREFIX + path, { headers: { range } });

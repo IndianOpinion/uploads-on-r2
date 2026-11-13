@@ -39,6 +39,15 @@ describe("7 configuration", () => {
     expect(config).toEqual(parseConfig({}).config);
   });
 
+  it("EDGE_CACHE_MAX_BYTES cannot be raised above the 64 MiB ceiling", () => {
+    const high = parseConfig({ EDGE_CACHE_MAX_BYTES: String(512 * 1024 * 1024) });
+    expect(high.config.edgeCacheMaxBytes).toBe(64 * 1024 * 1024);
+    expect(high.errors).toHaveLength(1);
+    const low = parseConfig({ EDGE_CACHE_MAX_BYTES: "1048576" });
+    expect(low.config.edgeCacheMaxBytes).toBe(1048576);
+    expect(low.errors).toEqual([]);
+  });
+
   it("T62: each config problem is logged once per environment, not per request", async () => {
     const h = await harness({ EDGE_CACHE: "maybe", EDGE_CACHE_MAX_BYTES: "lots" });
     await h.seed("a.jpg", bytes(5));

@@ -164,6 +164,35 @@ describe("4.5 edge cache", () => {
     expect(await h.cache.peek(URL_A)).toBeUndefined();
   });
 
+  it("an entry this Worker did not write (the zone's copy of an origin response) is never served", async () => {
+    const h = await harness();
+    await h.seed("a.jpg", bytes(40), { contentType: "image/jpeg" });
+    await h.cache.inner.put(
+      new Request(URL_A),
+      new Response("origin copy", {
+        headers: {
+          "content-type": "text/html",
+          "content-length": "11",
+          etag: '"origin"',
+          "last-modified": "Sun, 06 Nov 1994 08:49:37 GMT",
+          "cache-control": "public, max-age=600",
+          server: "origin-host.internal",
+        },
+      }),
+    );
+    const res = await h.runAndSettle(PREFIX + "a.jpg");
+    expect(res.headers.get(SOURCE)).toBe("r2");
+    expect(res.headers.get("content-type")).toBe("image/jpeg");
+    expect(res.headers.get("server")).toBeNull();
+    expect(await bodyBytes(res)).toEqual(bytes(40));
+    // The Worker's own copy replaces it, and is then served without R2.
+    const again = await h.run(PREFIX + "a.jpg");
+    expect(again.headers.get(SOURCE)).toBe("edge-cache");
+    expect(again.headers.get("x-uploads-entry")).toBeNull();
+    expect(await bodyBytes(again)).toEqual(bytes(40));
+    expect(h.bucket.count("get")).toBe(1);
+  });
+
   it("objects stored with a content-encoding are not written to the edge cache", async () => {
     const h = await harness();
     await h.seed("a.svg", bytes(20), { contentEncoding: "gzip" });

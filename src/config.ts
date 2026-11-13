@@ -32,7 +32,7 @@ export interface Config {
   readonly publicPrefix: string;
   readonly keyPrefix: string;
   readonly mediaExtensions: ReadonlySet<string>;
-  /** Built-in plus extra deny prefixes, lower-cased, each ending in `/`. */
+  /** Built-in plus extra deny prefixes, lower-cased, without a leading `/`. Matched as plain string prefixes. */
   readonly denyPrefixes: readonly string[];
   readonly cacheControl: Readonly<Record<Family, string>>;
   readonly edgeCache: boolean;
@@ -69,6 +69,12 @@ export const BUILT_IN_DENY_PREFIXES: readonly string[] = [
 ];
 export const DEFAULT_BROWSER_CACHE_CONTROL = "public, max-age=31536000, immutable";
 export const DEFAULT_EDGE_CACHE_MAX_BYTES = 64 * 1024 * 1024;
+/**
+ * Hard ceiling for EDGE_CACHE_MAX_BYTES. A cache write tees the body, and a
+ * slow client lets the runtime buffer up to the whole object; above this the
+ * worst case nears the 128 MB isolate limit.
+ */
+export const MAX_EDGE_CACHE_MAX_BYTES = 64 * 1024 * 1024;
 export const DEFAULT_NEGATIVE_CACHE_SECONDS = 60;
 export const MAX_NEGATIVE_CACHE_SECONDS = 3600;
 export const DEFAULT_SOURCE_HEADER = "x-uploads-source";
@@ -203,6 +209,9 @@ export function parseConfig(env: Env): ParsedConfig {
     const n = parseNonNegativeInteger(env.EDGE_CACHE_MAX_BYTES);
     if (n === null) {
       errors.push("EDGE_CACHE_MAX_BYTES must be a non-negative integer; using the default");
+    } else if (n > MAX_EDGE_CACHE_MAX_BYTES) {
+      errors.push(`EDGE_CACHE_MAX_BYTES is above the ${MAX_EDGE_CACHE_MAX_BYTES}-byte ceiling; using the ceiling`);
+      edgeCacheMaxBytes = MAX_EDGE_CACHE_MAX_BYTES;
     } else {
       edgeCacheMaxBytes = n;
     }

@@ -56,6 +56,12 @@ interface State {
 const SVG_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; sandbox";
 const NEGATIVE_MARKER = "x-uploads-negative";
 const NEGATIVE_PARAM = "uploads-on-r2-negative";
+/**
+ * Set on every entry this Worker writes. On a zone route the Cache API
+ * shares its keys with the zone cache, so the zone's own copy of a fallback
+ * response can sit under the same URL; only marked entries are trusted.
+ */
+const ENTRY_MARKER = "x-uploads-entry";
 
 const warnedMissingBinding = new WeakSet();
 
@@ -221,6 +227,9 @@ function metaFromR2(object: R2Object, extension: string): Meta {
 
 function metaFromCache(response: Response): Meta | null {
   const h = response.headers;
+  if (response.status !== 200 || h.get(ENTRY_MARKER) !== "1") {
+    return null;
+  }
   const length = h.get("content-length");
   const etag = h.get("etag");
   const lastModified = h.get("last-modified");
@@ -501,10 +510,9 @@ async function fullGet(
     return respondFromFull(state, meta, object.body, spec, "r2");
   }
   const [client, copy] = object.body.tee();
-  const stored = new Response(withLength(copy, meta.size), {
-    status: 200,
-    headers: representationHeaders(meta, state.config, null, meta.size),
-  });
+  const storedHeaders = representationHeaders(meta, state.config, null, meta.size);
+  storedHeaders.set(ENTRY_MARKER, "1");
+  const stored = new Response(withLength(copy, meta.size), { status: 200, headers: storedHeaders });
   cacheWrite(state, cache, cacheKey(state.url), stored);
   return makeResponse(
     withLength(client, meta.size),

@@ -147,6 +147,25 @@ describe("content types", () => {
     expect(contentTypeFor("heic", "")).toBe("application/octet-stream");
   });
 
+  it("trusts a stored type only when it is one well-formed type of the same kind as the extension", () => {
+    expect(contentTypeFor("jpg", "image/pjpeg")).toBe("image/pjpeg");
+    expect(contentTypeFor("mp4", "video/quicktime")).toBe("video/quicktime");
+    expect(contentTypeFor("jpg", "application/pdf")).toBe("image/jpeg");
+    expect(contentTypeFor("jpg", "text/plain")).toBe("image/jpeg");
+    expect(contentTypeFor("pdf", "image/png")).toBe("application/pdf");
+    expect(contentTypeFor("mp3", "video/mp4")).toBe("audio/mpeg");
+    // A comma list lets a browser pick the last type; never trusted.
+    expect(contentTypeFor("jpg", "image/jpeg, text/html")).toBe("image/jpeg");
+    expect(contentTypeFor("jpg", "image/jpeg\r\nx-evil: 1")).toBe("image/jpeg");
+    expect(contentTypeFor("jpg", "image")).toBe("image/jpeg");
+    expect(contentTypeFor("jpg", "TEXT/HTML ")).toBe("image/jpeg");
+    // An added extension with no table entry: stored type if safe, else octet-stream.
+    expect(contentTypeFor("heic", "image/heic")).toBe("image/heic");
+    expect(contentTypeFor("heic", "text/html")).toBe("application/octet-stream");
+    expect(contentTypeFor("heic", "application/rss+xml")).toBe("application/octet-stream");
+    expect(contentTypeFor("heic", "text/javascript; charset=utf-8")).toBe("application/octet-stream");
+  });
+
   it("groups types into cache families", () => {
     expect(familyOf("image/webp")).toBe("image");
     expect(familyOf("video/mp4")).toBe("video");
