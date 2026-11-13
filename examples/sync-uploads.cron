@@ -1,0 +1,7 @@
+# /etc/cron.d/sync-uploads: copy new media to R2.
+# Every 10 minutes: files changed in the last 30 minutes (overlap on purpose).
+# Nightly: a full pass, which also catches anything a short run missed.
+# Replace the paths, the remote and the bucket with your own.
+
+*/10 * * * * www-data /usr/local/bin/sync-uploads.sh --source /var/www/example.com/wp-content/uploads --remote r2:your-bucket --rclone /usr/local/bin/rclone --max-age 30m >>/var/log/sync-uploads.log 2>&1
+17 3 * * *   www-data /usr/local/bin/sync-uploads.sh --source /var/www/example.com/wp-content/uploads --remote r2:your-bucket --rclone /usr/local/bin/rclone >>/var/log/sync-uploads.log 2>&1
