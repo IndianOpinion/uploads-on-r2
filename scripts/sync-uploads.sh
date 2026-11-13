@@ -145,6 +145,11 @@ main() {
     filters+=(--filter "- /${name}/**" --filter "- /sites/*/${name}/**")
   done
 
+  # A relative source that starts with '-' would be read by rclone as a flag.
+  if [[ "$source" == -* ]]; then
+    source="./$source"
+  fi
+
   local destination="$remote"
   if [[ -n "$key_prefix" ]]; then
     destination="${remote}/${key_prefix%/}"

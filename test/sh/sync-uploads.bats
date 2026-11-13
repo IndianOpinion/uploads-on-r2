@@ -90,6 +90,14 @@ run_sync() {
   [[ "$heic_line" != *"--header-upload"* ]]
 }
 
+@test "a source that starts with a dash is never read as an rclone flag" {
+  mkdir -p "$WORK/-n"
+  cd "$WORK"
+  run "$SCRIPT" --source "-n" --remote r2:your-bucket --rclone "$FAKE" --extensions jpg
+  [ "$status" -eq 0 ]
+  grep -q -- "^copy ./-n r2:your-bucket/wp-content/uploads " "$LOG"
+}
+
 @test "help exits 0" {
   run "$SCRIPT" --help
   [ "$status" -eq 0 ]

@@ -19,11 +19,13 @@ uses [Semantic Versioning](https://semver.org/).
   multisite `sites/<n>/`; operators can add prefixes but not remove them.
 - Media extension allowlist; everything else goes to the origin untouched.
 - Content type from stored metadata, corrected when missing, generic or
-  able to run as a document; `nosniff` everywhere and a sandboxing CSP on SVG.
+  able to run as a document or of another kind than the extension;
+  `nosniff` everywhere and a sandboxing CSP on SVG.
 - Conditional requests (`304` and `412`) in RFC 9110 order, and single
   byte ranges (`206` and `416`) including suffix ranges and `If-Range`.
-- Edge caching through the Cache API, with ranges cut from a cached full
-  copy, and a 60 second negative cache for repeated origin 404s.
+- Edge caching through the Cache API (objects up to 64 MiB, only entries
+  the Worker wrote are served), with ranges cut from a cached full copy,
+  and a 60 second negative cache for repeated origin 404s.
 - Browser cache policy per content-type family through a small map.
 - One JSON log line per request, and a diagnostic source header.
 - `scripts/sync-uploads.sh`: copy-only rclone wrapper with media filters,

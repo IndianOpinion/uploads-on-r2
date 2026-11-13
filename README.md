@@ -88,11 +88,11 @@ invalid value is replaced by its default and logged once per isolate.
 | `PUBLIC_PREFIX`           | `/wp-content/uploads/`                            | Public path served. Must start and end with `/`.                                                                 |
 | `KEY_PREFIX`              | `wp-content/uploads/`                             | Prepended to the path after the prefix to make the object key. May be empty.                                     |
 | `MEDIA_EXTENSIONS`        | `jpg,jpeg,png,gif,webp,avif,svg,mp4,webm,mp3,pdf` | Comma-separated. Replaces the default list. Only these are read from R2.                                         |
-| `EXTRA_DENY_PREFIXES`     | empty                                             | Comma-separated folders to refuse, added to the built-in list.                                                   |
+| `EXTRA_DENY_PREFIXES`     | empty                                             | Comma-separated key prefixes to refuse, added to the built-in list. End a folder with `/`.                       |
 | `BROWSER_CACHE_CONTROL`   | `public, max-age=31536000, immutable`             | `cache-control` on R2 and edge-cache responses.                                                                  |
 | `CACHE_CONTROL_BY_FAMILY` | empty                                             | Per-family override: a TOML table or JSON object with keys `image`, `video`, `audio`, `document` (PDF), `other`. |
 | `EDGE_CACHE`              | `on`                                              | `on` or `off`. Edge caching through the Workers Cache API.                                                       |
-| `EDGE_CACHE_MAX_BYTES`    | `67108864` (64 MiB)                               | Larger objects are never written to the edge cache.                                                              |
+| `EDGE_CACHE_MAX_BYTES`    | `67108864` (64 MiB)                               | Larger objects are never written to the edge cache. Also the ceiling: a larger value is clamped to 64 MiB.       |
 | `NEGATIVE_CACHE_SECONDS`  | `60`                                              | How long a repeated origin 404 is answered by the Worker. `0` turns it off. Max 3600. Needs the edge cache.      |
 | `ORIGIN_OVERRIDE`         | unset                                             | Absolute `https://` base URL for fallback. For testing on a host with no route only.                             |
 | `SOURCE_HEADER`           | `x-uploads-source`                                | Diagnostic header name. An empty string disables it.                                                             |

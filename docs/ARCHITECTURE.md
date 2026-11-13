@@ -178,12 +178,17 @@ Details and reasons:
    reads fast, the runtime buffers the difference, and a large video could
    push an isolate past its 128 MB memory limit. 64 MiB keeps the worst case
    under half of it, and also bounds the bytes dropped when slicing a range
-   from a cached copy. Operators can raise it.
+   from a cached copy. It is also the ceiling: operators can lower it, and a
+   larger value is clamped to 64 MiB and logged.
 5. **Stored content types are not always trusted.** Besides empty and
    generic types (case 30), a stored type a browser could run as a document
    on the site's origin (HTML, XHTML, XML and any `+xml`, JavaScript, SVG on
    a non-SVG extension) is replaced by the extension's type. A `.jpg`
    uploaded by another copier as `text/html` would otherwise be an XSS.
+   For an extension in the table, the stored type must also be one
+   well-formed type of the same kind (`image/*` for an image extension,
+   exactly `application/pdf` for `.pdf`); a comma list, a bare word or a
+   different kind is replaced too.
 6. **Multisite private folders.** Deny prefixes are matched at the start of
    the key and also after a leading `sites/<n>/`, where WordPress multisite
    keeps each site's exports and plugin folders.
@@ -218,3 +223,9 @@ Details and reasons:
 15. **Unexpected errors fail open.** Any exception while serving media is
     logged and the request falls back to the origin, except deny and an
     unreachable origin, which fail closed (PRD 4.11).
+16. **Edge-cache entries are marked.** On a zone route the Cache API shares
+    keys with the zone cache, so the zone's own copy of a fallback response
+    can sit under the same URL. Every entry the Worker writes carries an
+    internal marker header, and a lookup that returns an unmarked entry (or
+    a non-`200`) is treated as a miss. The marker is never sent to clients,
+    because responses are rebuilt from the cached validators.
