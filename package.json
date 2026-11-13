@@ -1,0 +1,36 @@
+{
+  "name": "@indianopinion/uploads-on-r2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Cloudflare Worker that serves the WordPress uploads path from an R2 bucket, with origin fallback.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:sh": "bats test/sh",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.8.0",
+    "@cloudflare/workers-types": "5.20261112.1",
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "prettier": "3.10.0",
+    "smol-toml": "1.9.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.2",
+    "vitest": "4.1.12",
+    "wrangler": "4.160.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IndianOpinion/uploads-on-r2.git"
+  }
+}

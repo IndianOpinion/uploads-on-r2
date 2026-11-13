@@ -1,0 +1,43 @@
+# uploads-on-r2: Worker configuration.
+#
+# Every name below is a placeholder: your-worker, example.com and
+# your-bucket. Replace them with your own before deploying. They are plain
+# names (no angle brackets) so that `wrangler deploy --dry-run` validates
+# this file in CI.
+#
+# Rule: every top-level key sits ABOVE the first [table] header. TOML gives
+# a key that follows [[r2_buckets]] to that table, so a `routes` line placed
+# below it deploys a Worker with no routes, and Wrangler only warns.
+
+name = "your-worker"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+# Keep the route narrow: the uploads path only. Add the www. variant if the
+# site uses it.
+routes = [
+  { pattern = "example.com/wp-content/uploads/*", zone_name = "example.com" },
+]
+
+[vars]
+# All optional. The values shown are the defaults; see the README for the full table.
+# PUBLIC_PREFIX = "/wp-content/uploads/"
+# KEY_PREFIX = "wp-content/uploads/"
+# MEDIA_EXTENSIONS = "jpg,jpeg,png,gif,webp,avif,svg,mp4,webm,mp3,pdf"
+# EXTRA_DENY_PREFIXES = ""
+# BROWSER_CACHE_CONTROL = "public, max-age=31536000, immutable"
+# CACHE_CONTROL_BY_FAMILY = { document = "public, max-age=86400" }
+# EDGE_CACHE = "on"
+# EDGE_CACHE_MAX_BYTES = "67108864"
+# NEGATIVE_CACHE_SECONDS = "60"
+# ORIGIN_OVERRIDE = ""
+# SOURCE_HEADER = "x-uploads-source"
+# HOP_HEADER = "x-uploads-hop"
+
+[observability]
+enabled = true
+
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "your-bucket"
