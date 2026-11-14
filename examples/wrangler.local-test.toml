@@ -1,0 +1,21 @@
+# A configuration for trying the Worker locally with `wrangler dev --local`,
+# where there is no zone route. ORIGIN_OVERRIDE gives fallback somewhere to
+# go; without it, fetch(request) would come back to the Worker itself.
+#
+#   npx wrangler dev --local --config examples/wrangler.local-test.toml
+#   npx wrangler r2 object put your-bucket/wp-content/uploads/hello.png --file hello.png --local
+#   curl -sI http://localhost:8787/wp-content/uploads/hello.png
+#
+# Every top-level key sits above the first table header.
+
+name = "your-worker-local"
+main = "../src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+[vars]
+ORIGIN_OVERRIDE = "https://example.com"
+
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "your-bucket"

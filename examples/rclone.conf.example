@@ -1,0 +1,14 @@
+# rclone remote for Cloudflare R2. Put this in rclone's own config file
+# (rclone config file shows where). Never commit real keys.
+#
+# no_check_bucket = true is required for tokens scoped to one bucket:
+# without it rclone tries to create the bucket and fails.
+
+[r2]
+type = s3
+provider = Cloudflare
+access_key_id = <your-access-key-id>
+secret_access_key = <your-secret-access-key>
+endpoint = https://<your-account-id>.r2.cloudflarestorage.com
+acl = private
+no_check_bucket = true
